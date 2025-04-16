@@ -50,3 +50,5 @@ dataset/
 # Flask specific
 instance/
 webapp.db
+docker build -t flask-cats-vs-dogs .
+docker run -p 5000:5000 flask-cats-vs-dogs

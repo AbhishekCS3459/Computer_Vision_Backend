@@ -6,7 +6,8 @@ import os
 from io import BytesIO
 
 app = Flask(__name__)
-model = load_model("cats_vs_dogs_model.h5")
+model_path = os.path.join(os.path.dirname(__file__), "cats_vs_dogs_model.h5")
+model = load_model(model_path)
 classes = ['cat', 'dog', 'human']
 
 def prepare_image(img):
@@ -33,4 +34,5 @@ def test():
     return jsonify({"message": "Test route is working!"})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
