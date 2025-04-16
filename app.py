@@ -27,7 +27,10 @@ def predict():
     prediction = model.predict(img_array)
     class_index = np.argmax(prediction)
     return jsonify({"result": classes[class_index]})
-
+# write a test route
+@app.route("/test", methods=["GET"])
+def test():
+    return jsonify({"message": "Test route is working!"})
 
 if __name__ == "__main__":
     app.run(debug=True)

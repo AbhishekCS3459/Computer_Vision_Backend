@@ -1,34 +1,47 @@
-# Use a slim base image with Python and lib dependencies
-FROM python:3.12-slim
+# Stage 1: Build Stage (with full Python and system libs)
+FROM python:3.12 AS builder
 
-# Set environment variables to prevent Python from writing .pyc files and buffering logs
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Set working directory
 WORKDIR /app
 
-# Install system dependencies (for TensorFlow)
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
+    libglib2.0-0 libsm6 libxext6 libxrender-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy only requirements first for better Docker cache
 COPY requirements.txt .
 
-# Install dependencies
+# Install dependencies into a separate folder
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir --target=/install -r requirements.txt
 
-# Copy the rest of the app files
+# Copy your application files (exclude via .dockerignore)
 COPY . .
 
-# Expose port
+
+
+# Stage 2: Final minimal runtime image
+FROM python:3.12-slim AS final
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Install system dependencies for runtime (same as before)
+RUN apt-get update && apt-get install -y \
+    libglib2.0-0 libsm6 libxext6 libxrender-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy installed Python packages from builder
+COPY --from=builder /install /usr/local/lib/python3.12/site-packages
+
+# Copy your application code
+COPY --from=builder /app /app
+
+# Expose port and run the app
 EXPOSE 5000
 
-# Run the app with Gunicorn
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
