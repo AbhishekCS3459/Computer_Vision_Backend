@@ -1,0 +1,52 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+ENV/
+env/
+.venv/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Logs and debug files
+*.log
+*.out
+*.err
+
+# TensorFlow model files
+*.h5
+*.keras
+*.pb
+*.tflite
+
+# Python test cache
+.pytest_cache/
+.coverage
+
+# System-specific files
+.DS_Store
+Thumbs.db
+
+# VS Code settings
+.vscode/
+
+# Docker artifacts
+*.tar
+*.img
+*.bak
+
+# Datasets or large raw data files
+dataset/
+*.zip
+*.tar.gz
+
+# Compiled C extensions
+*.so
+
+# Flask specific
+instance/
+webapp.db
