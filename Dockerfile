@@ -31,9 +31,9 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Install system dependencies for runtime (same as before)
-RUN apt-get update && apt-get install -y \
-    libglib2.0-0 libsm6 libxext6 libxrender-dev \
-    && rm -rf /var/lib/apt/lists/*
+# RUN apt-get update && apt-get install -y \
+#     libglib2.0-0 libsm6 libxext6 libxrender-dev \
+#     && rm -rf /var/lib/apt/lists/*
 
 # Copy installed Python packages from builder
 COPY --from=builder /install /usr/local/lib/python3.12/site-packages
@@ -44,4 +44,5 @@ COPY --from=builder /app /app
 # Expose port and run the app
 EXPOSE 5000
 
-CMD ["python", "app.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
+

@@ -4,8 +4,10 @@ from tensorflow.keras.preprocessing import image # type: ignore
 import numpy as np
 import os
 from io import BytesIO
+from flask_cors import CORS 
 
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:3000"])
 model_path = os.path.join(os.path.dirname(__file__), "cats_vs_dogs_model.h5")
 model = load_model(model_path)
 classes = ['cat', 'dog', 'human']
