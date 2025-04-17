@@ -1,48 +1,22 @@
-# Stage 1: Build Stage (with full Python and system libs)
-FROM python:3.12 AS builder
+# Use official Python image
+FROM python:3.9-slim
 
+# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+# Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    libglib2.0-0 libsm6 libxext6 libxrender-dev \
-    && rm -rf /var/lib/apt/lists/*
-
+# Copy requirements and install dependencies
 COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Install dependencies into a separate folder
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir --target=/install -r requirements.txt
-
-# Copy your application files (exclude via .dockerignore)
+# Copy project files (excluding venv)
 COPY . .
 
-
-
-# Stage 2: Final minimal runtime image
-FROM python:3.12-slim AS final
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-WORKDIR /app
-
-# Install system dependencies for runtime (same as before)
-# RUN apt-get update && apt-get install -y \
-#     libglib2.0-0 libsm6 libxext6 libxrender-dev \
-#     && rm -rf /var/lib/apt/lists/*
-
-# Copy installed Python packages from builder
-COPY --from=builder /install /usr/local/lib/python3.12/site-packages
-
-# Copy your application code
-COPY --from=builder /app /app
-
-# Expose port and run the app
+# Expose the port your app runs on
 EXPOSE 5000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
-
+# Run the Flask app
+CMD ["python", "main.py"]
